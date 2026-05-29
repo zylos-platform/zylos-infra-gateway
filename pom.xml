@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    zylos-infra-gateway — the Zylos cluster-perimeter API gateway.
+
+    Spring Cloud Gateway (WebFlux/Netty, reactive). Responsibilities:
+      - Validate ingress tokens (aud == zylos-gateway) via the security starter
+      - Route to internal services
+      - Exchange the ingress token per-service (aud downscoping),
+        producing the single-hop act claim via the ActClaimMapper
+      - Coarse OPA authorization at the edge
+
+    Inherits zylos-service-parent. Declares zylos-infra-security-starter.
+  -->
+
+  <parent>
+    <groupId>app.zylos</groupId>
+    <artifactId>zylos-service-parent</artifactId>
+    <version>0.3.0</version>
+    <relativePath/>
+    <!-- lookup parent from repository -->
+  </parent>
+
+  <artifactId>zylos-infra-gateway</artifactId>
+  <version>0.1.0</version>
+  <packaging>jar</packaging>
+
+  <name>Zylos Infra :: Gateway</name>
+  <description>Zylos cluster-perimeter API gateway (Spring Cloud Gateway WebFlux)</description>
+  <url>https://github.com/zylos-platform/zylos-infra-gateway</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer/>
+  </developers>
+  <scm>
+    <connection/>
+    <developerConnection/>
+    <tag/>
+    <url/>
+  </scm>
+
+  <properties>
+    <jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
+    <distroless.image>gcr.io/distroless/java25-debian12:nonroot</distroless.image>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>app.zylos</groupId>
+      <artifactId>zylos-infra-security-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/zylos-platform/zylos-service-parent</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>${jib-maven-plugin.version}</version>
+        <configuration>
+          <from>
+            <image>${distroless.image}</image>
+            <platforms>
+              <platform>
+                <architecture>amd64</architecture>
+                <os>linux</os>
+              </platform>
+              <platform>
+                <architecture>arm64</architecture>
+                <os>linux</os>
+              </platform>
+            </platforms>
+          </from>
+          <to>
+            <image>ghcr.io/zylos-platform/zylos-infra-gateway:${project.version}</image>
+            <tags>
+              <tag>latest</tag>
+            </tags>
+          </to>
+          <container>
+            <ports>
+              <port>8080</port>
+            </ports>
+            <user>nonroot</user>
+            <jvmFlags>
+              <jvmFlag>-XX:MaxRAMPercentage=75.0</jvmFlag>
+              <jvmFlag>-XX:InitialRAMPercentage=50.0</jvmFlag>
+            </jvmFlags>
+            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+          </container>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
