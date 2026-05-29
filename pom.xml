@@ -50,7 +50,7 @@
 
   <properties>
     <jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
-    <distroless.image>gcr.io/distroless/java25-debian12:nonroot</distroless.image>
+    <distroless.image>gcr.io/distroless/java25-debian13:nonroot</distroless.image>
   </properties>
 
   <dependencies>
