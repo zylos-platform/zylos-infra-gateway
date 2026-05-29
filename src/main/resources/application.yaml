@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: zylos-infra-gateway
+
+  # Reactor automatic context propagation required so the security starter's
+  # reactive MDC enrichment (correlation_id, subject) bridges into log MDC.
+  reactor:
+    context-propagation: auto
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes: [ ]
+
+zylos:
+  security:
+    issuer-uri: ${ZYLOS_ISSUER_URI:http://keycloak.keycloak.svc.cluster.local:8080/realms/zylos}
+    expected-audience: zylos-gateway
+    actor-chains:
+      # Gateway is the ingress hop; ingress tokens have no act claim to match.
+      enabled: false
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
