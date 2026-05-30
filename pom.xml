@@ -134,6 +134,7 @@
           <container>
             <ports>
               <port>8080</port>
+              <port>9000</port>
             </ports>
             <user>nonroot</user>
             <jvmFlags>
