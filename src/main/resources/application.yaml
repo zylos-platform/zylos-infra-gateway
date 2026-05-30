@@ -31,6 +31,10 @@ spring:
               uri: ${ZYLOS_HELLO_SERVICE_URI:http://zylos-internal-hello.zylos.svc.cluster.local:8080}
               predicates:
                 - Path=/api/v1/hello/**
+              filters:
+                - name: TokenExchange
+                  args:
+                    audience: zylos-internal-hello
 
 zylos:
   security:
@@ -39,6 +43,16 @@ zylos:
     actor-chains:
       # Gateway is the ingress hop; ingress tokens have no act claim to match.
       enabled: false
+  gateway:
+    token-exchange:
+      client-id: ${ZYLOS_GATEWAY_CLIENT_ID:zylos-gateway}
+      # Injected from a Kubernetes secret in the cluster; never commit a value.
+      client-secret: ${ZYLOS_GATEWAY_CLIENT_SECRET:""}
+      # Defaults to the issuer's standard Keycloak token endpoint.
+      token-endpoint: ${ZYLOS_TOKEN_ENDPOINT:${zylos.security.issuer-uri}/protocol/openid-connect/token}
+      cache:
+        ttl: 90s
+        max-size: 10000
 
 server:
   port: 8080

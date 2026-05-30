@@ -9,17 +9,20 @@ and this repository adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- First internal-service route (`hello-service`): `Path=/api/v1/hello/**` →
-  env-driven service URI, full path forwarded.
-- Forwarded-header trust via `trusted-proxies` (default kind pod CIDR), enabling
-  X-Forwarded-* / Forwarded for downstream services.
-- `RemoveRequestHeader=Cookie` default filter (no cookies forwarded downstream).
-- Route-level integration tests (`HelloRouteIT`) against a live server with a
-  WireMock backend and WireMock Keycloak; `JwtTestSupport` for minting real
-  RS256 tokens.
-- ADR 0002 (routing and forwarded headers).
+- Gateway-side RFC 8693 token exchange: a `TokenExchange` route filter that
+  downscopes the ingress token's audience to a per-service audience and
+  replaces the forwarded `Authorization` header. Produces the single-hop `act`
+  claim (gateway as actor) via the Keycloak ActClaimMapper.
+- `GatewayTokenExchanger` with an in-memory Caffeine async cache
+  (`(subject, audience)` key, 90s TTL, single-flight, errors not cached) and
+  `zylos_token_exchange_total` / `zylos_token_exchange_cache` metrics.
+- `TokenExchangeProperties` (`zylos.gateway.token-exchange.*`) and a dedicated
+  token-exchange `WebClient` with a bounded response timeout.
+- `TokenExchangeFilterIT` covering header replacement, exchange request shape,
+  caching, 502-on-failure, and unauthenticated short-circuit.
+- ADR 0003 (gateway token exchange).
 
-### Notes
+### Changed
 
-- Until the next PR, the gateway forwards the raw ingress token; Future PR adds the
-  per-service token exchange that corrects the downstream audience.
+- `hello-service` route now applies the `TokenExchange` filter
+  (`audience: zylos-internal-hello`).

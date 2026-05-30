@@ -40,25 +40,13 @@ jobs:
 
       - name: Verify formatting (Spotless)
         run: ./mvnw -B -ntp spotless:check
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compile
-        run: ./mvnw -B -ntp compile
-
-      - name: Unit tests
-        run: ./mvnw -B -ntp test
-
-      - name: Integration tests
-        run: ./mvnw -B -ntp verify -DskipUnitTests
+      - name: Build, Test, and Verify Coverage
+        run: ./mvnw -B -ntp verify
         env:
           TESTCONTAINERS_RYUK_DISABLED: "true"
 
-      - name: JaCoCo coverage gate (85%)
-        run: ./mvnw -B -ntp jacoco:check
-
       - name: Jib build to local Docker (smoke)
-        if: github.ref == 'refs/heads/main'
         run: ./mvnw -B -ntp compile jib:dockerBuild -Djib.to.image=zylos-infra-gateway:ci
 
       - name: Upload test reports

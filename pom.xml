@@ -18,7 +18,7 @@
   <parent>
     <groupId>app.zylos</groupId>
     <artifactId>zylos-service-parent</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <relativePath/>
     <!-- lookup parent from repository -->
   </parent>
@@ -66,6 +66,11 @@
     <dependency>
       <groupId>app.zylos</groupId>
       <artifactId>zylos-infra-security-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
     </dependency>
 
     <dependency>
@@ -138,6 +143,24 @@
             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
           </container>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*IT.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
