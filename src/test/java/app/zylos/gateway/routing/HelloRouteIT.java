@@ -7,6 +7,7 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,16 +55,16 @@ class HelloRouteIT {
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody("""
-                        {
-                          "issuer": "%1$s",
-                          "jwks_uri": "%1$s/protocol/openid-connect/certs",
-                          "token_endpoint": "%1$s/protocol/openid-connect/token",
-                          "authorization_endpoint": "%1$s/protocol/openid-connect/auth",
-                          "response_types_supported": ["code"],
-                          "subject_types_supported": ["public"],
-                          "id_token_signing_alg_values_supported": ["RS256"]
-                        }
-                        """.formatted(issuer()))));
+                    {
+                      "issuer": "%1$s",
+                      "jwks_uri": "%1$s/protocol/openid-connect/certs",
+                      "token_endpoint": "%1$s/protocol/openid-connect/token",
+                      "authorization_endpoint": "%1$s/protocol/openid-connect/auth",
+                      "response_types_supported": ["code"],
+                      "subject_types_supported": ["public"],
+                      "id_token_signing_alg_values_supported": ["RS256"]
+                    }
+                    """.formatted(issuer()))));
         KEYCLOAK.stubFor(get(urlEqualTo(REALM_PATH + "/protocol/openid-connect/certs"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -92,6 +93,12 @@ class HelloRouteIT {
         registry.add("spring.cloud.gateway.server.webflux.routes[0].predicates[0]", () -> "Path=/api/v1/hello/**");
         // Trust all proxies in tests so X-Forwarded-* headers are generated.
         registry.add("spring.cloud.gateway.server.webflux.trusted-proxies", () -> ".*");
+    }
+
+    @BeforeEach
+    void resetJournals() {
+        KEYCLOAK.resetRequests();
+        BACKEND.resetRequests();
     }
 
     @Test
