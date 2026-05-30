@@ -11,7 +11,26 @@ spring:
     gateway:
       server:
         webflux:
-          routes: [ ]
+          # Trust forwarded headers only from in-cluster proxies. Setting this
+          # activates the Forwarded and X-Forwarded-* header filters (off by
+          # default since Spring Cloud 2025.0). Default targets kind's pod CIDR;
+          # override per-environment. Tighten in production to the mesh's egress
+          # range.
+          trusted-proxies: '${ZYLOS_TRUSTED_PROXIES:10\.244\..*}'
+
+          # Filters applied to every route.
+          default-filters:
+            # The gateway is Bearer-token based; downstream services are
+            # token-authenticated and never read cookies. Strip Cookie on the
+            # way in so no browser cookie is ever forwarded to an internal
+            # service.
+            - RemoveRequestHeader=Cookie
+
+          routes:
+            - id: hello-service
+              uri: ${ZYLOS_HELLO_SERVICE_URI:http://zylos-internal-hello.zylos.svc.cluster.local:8080}
+              predicates:
+                - Path=/api/v1/hello/**
 
 zylos:
   security:
