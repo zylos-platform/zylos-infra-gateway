@@ -59,6 +59,11 @@ server:
   shutdown: graceful
 
 management:
+  server:
+    # Actuator on a dedicated port. The zylos-service-base chart's liveness/
+    # readiness/startup probes and ServiceMonitor target this management port,
+    # keeping operational endpoints off the main (Bearer-secured) traffic port.
+    port: 9000
   endpoints:
     web:
       exposure:
