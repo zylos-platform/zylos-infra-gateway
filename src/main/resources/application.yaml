@@ -28,7 +28,7 @@ spring:
 
           routes:
             - id: hello-service
-              uri: ${ZYLOS_HELLO_SERVICE_URI:http://zylos-internal-hello.zylos.svc.cluster.local:8080}
+              uri: ${ZYLOS_HELLO_SERVICE_URI:http://zylos-service-hello.zylos-services.svc.cluster.local:8080}
               predicates:
                 - Path=/api/v1/hello/**
               filters:
