@@ -62,7 +62,7 @@ public class TokenExchangeGatewayFilterFactory
 
     @Override
     public List<String> shortcutFieldOrder() {
-        return List.of("audience");
+        return List.of("audience", "scope");
     }
 
     @Override
@@ -73,7 +73,7 @@ public class TokenExchangeGatewayFilterFactory
                 .map(JwtAuthenticationToken::getToken)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED)))
                 .flatMap(jwt -> exchanger
-                        .exchange(jwt, config.getAudience())
+                        .exchange(jwt, config.getAudience(), config.getScope())
                         .onErrorResume(_ -> Mono.error(new ResponseStatusException(HttpStatus.BAD_GATEWAY))))
                 .flatMap(exchangedToken -> chain.filter(withBearer(exchange, exchangedToken)))
                 .onErrorResume(ResponseStatusException.class, e -> reject(exchange, (HttpStatus) e.getStatusCode()));
@@ -83,10 +83,13 @@ public class TokenExchangeGatewayFilterFactory
      * Filter configuration: the target audience for the exchanged token.
      */
     @Validated
+    @SuppressWarnings("unused") // used by Spring reflection
     public static class Config {
 
         @NotBlank(message = "The 'audience' argument is strictly required for the TokenExchange filter.")
         private String audience = "";
+
+        private String scope = "";
 
         public String getAudience() {
             return audience;
@@ -94,6 +97,14 @@ public class TokenExchangeGatewayFilterFactory
 
         public void setAudience(String audience) {
             this.audience = audience;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
         }
     }
 }
