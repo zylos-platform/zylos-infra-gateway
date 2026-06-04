@@ -106,7 +106,8 @@ class TokenExchangeFilterIT {
         registry.add("spring.cloud.gateway.server.webflux.routes[0].uri", BACKEND::baseUrl);
         registry.add("spring.cloud.gateway.server.webflux.routes[0].predicates[0]", () -> "Path=/api/v1/hello/**");
         registry.add(
-                "spring.cloud.gateway.server.webflux.routes[0].filters[0]", () -> "TokenExchange=zylos-internal-hello");
+                "spring.cloud.gateway.server.webflux.routes[0].filters[0]",
+                () -> "TokenExchange=zylos-internal-hello,hello-aud");
 
         registry.add("spring.cloud.gateway.server.webflux.trusted-proxies", () -> ".*");
         registry.add("zylos.gateway.token-exchange.client-id", () -> "zylos-gateway");
@@ -148,7 +149,9 @@ class TokenExchangeFilterIT {
 
         KEYCLOAK.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
                 .withRequestBody(containing("token-exchange"))
+                .withRequestBody(containing("subject_token_type"))
                 .withRequestBody(containing("audience=zylos-internal-hello"))
+                .withRequestBody(containing("scope=hello-aud"))
                 .withRequestBody(containing("client_id=zylos-gateway")));
     }
 
