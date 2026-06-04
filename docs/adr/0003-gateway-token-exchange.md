@@ -13,6 +13,15 @@ forwarding — and that exchange is what produces the single-hop `act` claim
 (gateway as actor) via the Keycloak ActClaimMapper, closing the delegation loop
 designed.
 
+## Correction: claim model and required parameters
+
+Keycloak V2 builds the exchanged token from the **calling client's** protocol
+mappers/scopes, not the target's, so the per-service audience must be supplied
+by an **optional client scope** on the gateway, requested per-route via `scope`.
+The filter now sends `subject_token_type` and a route-configured `scope`
+(`audience` retained as a restriction), and the exchanged-token cache key is
+`(subject, audience, scope)`. See gitops ADR 0015 for the realm-side model.
+
 ## Decision
 
 A `TokenExchange` gateway filter, applied per route with a target `audience`
