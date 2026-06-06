@@ -40,7 +40,7 @@ spring:
 zylos:
   security:
     issuer-uri: ${ZYLOS_ISSUER_URI:http://keycloak.zylos.local/realms/zylos}
-    jwk-set-uri: ${ZYLOS_JWK_SET_URI:http://localhost:8080/realms/zylos/protocol/openid-connect/certs}
+    jwk-set-uri: ${ZYLOS_JWK_SET_URI:http://keycloak.zylos.local/realms/zylos/protocol/openid-connect/certs}
     expected-audience: zylos-gateway
     actor-chains:
       # Gateway is the ingress hop; ingress tokens have no act claim to match.
@@ -51,7 +51,7 @@ zylos:
       # Injected from a Kubernetes secret in the cluster; never commit a value.
       client-secret: ${ZYLOS_GATEWAY_CLIENT_SECRET:""}
       # Defaults to the issuer's standard Keycloak token endpoint.
-      token-endpoint: ${ZYLOS_TOKEN_ENDPOINT:http://localhost:8080/realms/zylos/protocol/openid-connect/token}
+      token-endpoint: ${ZYLOS_TOKEN_ENDPOINT:http://keycloak.zylos.local/realms/zylos/protocol/openid-connect/token}
       cache:
         ttl: 90s
         max-size: 10000
