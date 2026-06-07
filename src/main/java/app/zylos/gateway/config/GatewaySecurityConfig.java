@@ -1,7 +1,9 @@
 package app.zylos.gateway.config;
 
+import org.springframework.boot.security.autoconfigure.actuate.web.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -39,12 +41,18 @@ import org.springframework.security.web.server.savedrequest.NoOpServerRequestCac
 public class GatewaySecurityConfig {
 
     @Bean
+    @Order(1)
+    public SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
+        return http.securityMatcher(EndpointRequest.toAnyEndpoint())
+                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http.authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/actuator/health/**", "/actuator/info")
-                        .permitAll()
-                        .anyExchange()
-                        .authenticated())
+        return http.authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(ServerHttpSecurity.CorsSpec::disable)
