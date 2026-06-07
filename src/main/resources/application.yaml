@@ -74,7 +74,7 @@ management:
     health:
       probes:
         enabled: true
-      show-details: when_authorized
+      show-details: always
   health:
     livenessstate:
       enabled: true
