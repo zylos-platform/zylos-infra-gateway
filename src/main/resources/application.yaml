@@ -16,7 +16,7 @@ spring:
           # default since Spring Cloud 2025.0). Default targets kind's pod CIDR;
           # override per-environment. Tighten in production to the mesh's egress
           # range.
-          trusted-proxies: '${ZYLOS_TRUSTED_PROXIES:10\.244\..*}'
+          trusted-proxies: '${ZYLOS_TRUSTED_PROXIES}'
 
           # Filters applied to every route.
           default-filters:
@@ -28,7 +28,7 @@ spring:
 
           routes:
             - id: hello-service
-              uri: ${ZYLOS_HELLO_SERVICE_URI:http://zylos-service-hello.zylos-services.svc.cluster.local:8080}
+              uri: ${ZYLOS_HELLO_SERVICE_URI}
               predicates:
                 - Path=/api/v1/hello/**
               filters:
@@ -37,21 +37,31 @@ spring:
                     audience: zylos-internal-hello
                     scope: hello-aud
 
+            - id: catalog-service
+              uri: ${ZYLOS_CATALOG_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/products/**
+              filters:
+                - name: TokenExchange
+                  args:
+                    audience: zylos-internal-catalog
+                    scope: catalog-aud
+
 zylos:
   security:
-    issuer-uri: ${ZYLOS_ISSUER_URI:http://keycloak.zylos.local/realms/zylos}
-    jwk-set-uri: ${ZYLOS_JWK_SET_URI:http://keycloak.zylos.local/realms/zylos/protocol/openid-connect/certs}
+    issuer-uri: ${ZYLOS_ISSUER_URI}
+    jwk-set-uri: ${ZYLOS_JWK_SET_URI}
     expected-audience: zylos-gateway
     actor-chains:
       # Gateway is the ingress hop; ingress tokens have no act claim to match.
       enabled: false
   gateway:
     token-exchange:
-      client-id: ${ZYLOS_GATEWAY_CLIENT_ID:zylos-gateway}
+      client-id: ${ZYLOS_GATEWAY_CLIENT_ID}
       # Injected from a Kubernetes secret in the cluster; never commit a value.
-      client-secret: ${ZYLOS_GATEWAY_CLIENT_SECRET:""}
+      client-secret: ${ZYLOS_GATEWAY_CLIENT_SECRET}
       # Defaults to the issuer's standard Keycloak token endpoint.
-      token-endpoint: ${ZYLOS_TOKEN_ENDPOINT:http://keycloak.zylos.local/realms/zylos/protocol/openid-connect/token}
+      token-endpoint: ${ZYLOS_TOKEN_ENDPOINT}
       cache:
         ttl: 90s
         max-size: 10000

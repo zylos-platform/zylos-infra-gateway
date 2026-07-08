@@ -1,0 +1,32 @@
+# application-test.yml
+
+ZYLOS_HELLO_SERVICE_URI: "http://localhost:8081"
+ZYLOS_CATALOG_SERVICE_URI: "http://localhost:8082"
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # Match localhost or loopback for testing safety
+          trusted-proxies: '127\.0\.0\.1'
+
+zylos:
+  security:
+    issuer-uri: "http://localhost:9999/realms/zylos"
+    jwk-set-uri: "http://localhost:9999/realms/zylos/protocol/openid-connect/certs"
+  gateway:
+    token-exchange:
+      client-id: "test-gateway"
+      client-secret: "test-secret"
+      token-endpoint: "http://localhost:9999/realms/zylos/protocol/openid-connect/token"
+
+# Turn off observability/tracing overhead entirely during testing phases
+management:
+  tracing:
+    export:
+      enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: false

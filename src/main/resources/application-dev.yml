@@ -1,0 +1,7 @@
+# application-dev.yml
+
+logging:
+  level:
+    reactor.netty: INFO
+    org.springframework.cloud.gateway: INFO
+    com.zylos.gateway: DEBUG

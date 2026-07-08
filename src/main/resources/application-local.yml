@@ -1,0 +1,14 @@
+# application-local.yml
+
+management:
+  tracing:
+    export:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  prometheus:
+    metrics:
+      export:
+        enabled: false
