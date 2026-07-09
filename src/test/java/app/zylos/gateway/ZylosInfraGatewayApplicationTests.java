@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -24,6 +25,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
  * without a real identity provider.
  */
 @SpringBootTest
+@ActiveProfiles("test")
 class ZylosInfraGatewayApplicationTests {
 
     private static WireMockServer wireMock;
